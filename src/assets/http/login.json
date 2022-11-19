@@ -1,0 +1,12 @@
+{
+  "fakeAuth": {
+    "email": "useremail@gmail.com",
+    "password": "Passw123*"
+  },
+  "fakeUserData": {
+    "token": "string-token-genereted-00012321",
+    "name": "User Name",
+    "email": "useremail@gmail.com",
+    "role": "admin"
+  }
+}
