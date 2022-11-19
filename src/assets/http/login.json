@@ -5,7 +5,7 @@
   },
   "fakeUserData": {
     "token": "string-token-genereted-00012321",
-    "name": "User Name",
+    "name": "Jhon Snow",
     "email": "useremail@gmail.com",
     "role": "admin"
   }
