@@ -10,13 +10,14 @@ import { AuthService } from './auth/auth.service';
 export class AppComponent {
   public appPages = [
     { title: 'Home', url: '/home', icon: 'home' },
-    { title: 'Customers', url: '/customers', icon: 'people' },
   ];
 
   userIsNotAuthenticated$!: Observable<boolean>
+  userName$!: Observable<string>
 
   constructor(private readonly _authService: AuthService, private router: Router) {
     this.userIsNotAuthenticated$ = this._authService.userIsNotAuthenticated
+    this.userName$ = this._authService.userName
   }
 
   logout() {

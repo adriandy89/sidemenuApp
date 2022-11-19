@@ -26,6 +26,10 @@ export interface FakeUserData {
 export class AuthService {
   private user$ = new BehaviorSubject<FakeUserData | null>(null);
 
+  constructor(private http: HttpClient) {
+    this.fakeRefresh()
+  }
+
   get userIsAuthenticated() {
     return this.user$.asObservable().pipe(
       map(user => {
@@ -62,7 +66,13 @@ export class AuthService {
     );
   }
 
-  constructor(private http: HttpClient) {}
+  get userName() {
+    return this.user$.asObservable().pipe(
+      map(user => {
+        return user!==null ? user.name : '';
+      })
+    );
+  }
 
   login(email: string, password: string): Observable<FakeUserData> {
     return this.http
@@ -72,6 +82,7 @@ export class AuthService {
         map((fakeData: FakeData) => {
         if (email === fakeData.fakeAuth.email && password === fakeData.fakeAuth.password){
           this.user$.next(fakeData.fakeUserData)
+          localStorage.setItem('USER_DATA', JSON.stringify(fakeData.fakeUserData))
           return fakeData.fakeUserData;
         } else {
           throw new HttpErrorResponse({
@@ -83,21 +94,14 @@ export class AuthService {
       }));
   }
 
+  fakeRefresh(){
+    const userData = localStorage.getItem('USER_DATA')!==null ? JSON.parse(localStorage.getItem('USER_DATA')!) : null;
+    this.user$.next(userData)
+    console.log(userData);
+  }
+
   logout() {
     this.user$.next(null);
   }
 
-  // private setUserData(userData: AuthResponseData) {
-  //   const expirationTime = new Date(
-  //     new Date().getTime() * 1000
-  //   );
-  //   this.user$.next(
-  //     new User(
-  //       userData.localId,
-  //       userData.email,
-  //       userData.idToken,
-  //       expirationTime
-  //     )
-  //   );
-  // }
 }

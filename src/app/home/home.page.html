@@ -6,8 +6,41 @@
 
 <ion-content>
 
-  <ion-button [routerLink]="'/customers'">
-    Go to Customers
-  </ion-button>
+  <ion-grid fixed>
+    <ion-row class="ion-align-items-center">
+      <ion-col sizeXl="6" sizeLg="6" sizeMd="6" sizeSm="12" sizeXs="12"><h3>Customers Management System</h3></ion-col>
+      <ion-col sizeXl="6" sizeLg="6" sizeMd="6" sizeSm="12" sizeXs="12" class="right" size="6">
+        <ion-button color="custom" (click)="openModal()">
+          Add Customer
+          <ion-icon slot="end" name="add"></ion-icon>
+        </ion-button>
+      </ion-col>
+    </ion-row>
+    <ion-row class="ion-align-items-center">
+      <ion-col size="12">
+        <ion-card class="card-width">
+          <ion-card-header>
+            <ion-card-title>Customers</ion-card-title>
+            <ion-card-subtitle>Total: {{customers.length}}</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list>
+              <ion-item *ngFor="let customer of customers">
+                <ion-thumbnail slot="start">
+                  <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/thumbnail.svg" />
+                </ion-thumbnail>
+                <ion-label>
+                  <h3>{{customer.name}}</h3>
+                  <p>{{customer.ocupation}}</p>
+                </ion-label>
+                <ion-icon slot="end" name="create-outline" (click)="openModal(customer!)"></ion-icon>
+                <ion-icon slot="end" name="trash-bin-outline" (click)="deleteCustomer(customer.id!)"></ion-icon>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 
 </ion-content>

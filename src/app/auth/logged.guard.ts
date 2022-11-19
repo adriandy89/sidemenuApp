@@ -22,7 +22,7 @@ export class LoggedGuard implements CanLoad, CanActivate {
     segments: UrlSegment[]
   ): Observable<boolean> | Promise<boolean> | boolean {
     if (!this.authService.userIsNotAuthenticated) {
-      this.router.navigateByUrl('/login');
+      this.router.navigateByUrl('/home');
     }
     return this.authService.userIsNotAuthenticated;
   }

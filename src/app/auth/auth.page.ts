@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { LoadingController, AlertController } from '@ionic/angular';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 import { AuthService, FakeUserData,  } from './auth.service';
 
@@ -12,7 +12,6 @@ import { AuthService, FakeUserData,  } from './auth.service';
   styleUrls: ['./auth.page.scss']
 })
 export class AuthPage implements OnInit, OnDestroy {
-  isLoading = false;
   authObs!: Subscription;
 
   constructor(
@@ -41,7 +40,6 @@ export class AuthPage implements OnInit, OnDestroy {
   }
 
   authenticate(email: string, password: string) {
-    this.isLoading = true;
     this.loadingCtrl
       .create({ keyboardClose: true, message: 'Logging in...' })
       .then(loadingEl => {
@@ -50,7 +48,6 @@ export class AuthPage implements OnInit, OnDestroy {
         this.authObs = this.authService.login(email, password).subscribe({
           next: (res: FakeUserData) => {
             console.log(res);
-            this.isLoading = false;
             loadingEl.dismiss();
             this.router.navigateByUrl('/home');
           },
