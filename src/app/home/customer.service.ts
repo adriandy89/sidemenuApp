@@ -62,7 +62,7 @@ export class CustomerService {
     await this.saveCustomerData(cust)
   }
 
-  async saveCustomerData(customers: Customer[]) {
+  private async saveCustomerData(customers: Customer[]) {
     this.customers$.next(customers);
     const resp = await this._storageService.setStore('CUSTOMERS_DATA', customers)
   }
