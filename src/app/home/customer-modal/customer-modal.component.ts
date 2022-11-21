@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ModalController } from '@ionic/angular';
 import { Customer, CustomerService } from '../customer.service';
 
@@ -12,14 +12,33 @@ export class CustomerModalComponent implements OnInit {
 
   name!: string;
   selectedCustomer: Customer | null = null;
+  customerForm: any = FormGroup;
 
-
-  constructor(private modalCtrl: ModalController, private _customerService: CustomerService ) {}
+  constructor(
+    private fb: FormBuilder,
+    private modalCtrl: ModalController,
+    private _customerService: CustomerService
+    ) {}
 
   ngOnInit(): void {
-    this.name = this._customerService.selectedCustomer === null ? 'Create' : 'Modify'
-    this.selectedCustomer = this._customerService.selectedCustomer
+    this.name = this._customerService.selectedCustomer === null ? 'Create' : 'Modify';
+    this.selectedCustomer = this._customerService.selectedCustomer;
+    this.customerForm = this.fb.group({
+      name: ['', [Validators.required]],
+      ocupation: ['', [Validators.required]]
+    });
   }
+
+  onSubmit() {
+    if (!this.customerForm.valid)
+      return;
+    this.confirm({
+      id: this.selectedCustomer === null ? '' : this.selectedCustomer.id,
+      ...this.customerForm.value
+    });
+  }
+
+  get f() { return this.customerForm.controls; }
 
   cancel() {
     return this.modalCtrl.dismiss(null, 'cancel');
@@ -27,19 +46,6 @@ export class CustomerModalComponent implements OnInit {
 
   confirm(customer: Customer) {
     return this.modalCtrl.dismiss(customer, 'confirm');
-  }
-
-  onSubmit(form: NgForm) {
-    if (!form.valid) {
-      return;
-    }
-    const name = form.value.name;
-    const ocupation = form.value.ocupation;
-
-    this.confirm({
-      id: this.selectedCustomer === null ? '' : this.selectedCustomer.id,
-      name,
-      ocupation });
   }
 
 }

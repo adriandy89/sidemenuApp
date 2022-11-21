@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject, from, Observable, tap } from 'rxjs';
+import { StorageService } from '../core/services/storage.service';
 
 export interface Customer {
   id?: string;
@@ -11,16 +13,22 @@ export interface Customer {
 })
 export class CustomerService {
 
-  private _customers: Customer[] = [];
+  private customers$: BehaviorSubject<Customer[]> = new BehaviorSubject(<Customer[]>[]);
   private _selectedCustomer: Customer | null;
 
-  constructor() {
-    this.fakeRefresh();
+  constructor(private _storageService: StorageService) {
     this._selectedCustomer = null;
   }
 
-  get customers(): Customer[] {
-    return this._customers;
+  getCustomers() {
+    this._storageService.getStore('CUSTOMERS_DATA').subscribe({
+      next: (data) => { this.customers$.next(data) },
+      error: (err) => { console.log(err) }
+    });
+  }
+
+  get customers(): Observable<Customer[]> {
+    return from(this.customers$);
   }
 
   get selectedCustomer(): Customer | null {
@@ -31,26 +39,32 @@ export class CustomerService {
     this._selectedCustomer = value;
   }
 
-  addCustomer(customer: Customer) {
-    customer.id= this.fakeUniqueId(),
-    this.customers.push(customer)
-    this.saveCustomerData()
+  async addCustomer(customer: Customer) {
+    customer.id = this.fakeUniqueId();
+    const cust = this.customers$.getValue();
+    cust.push(customer);
+    await this.saveCustomerData(cust);
   }
 
-  deleteCustomer(id: string) {
-    this._customers = this._customers.filter( (c: Customer) => c.id !== id )
-    this.saveCustomerData()
+  async deleteCustomer(id: string) {
+    const cust = this.customers$.getValue().filter((c: Customer) => c.id !== id);
+    await this.saveCustomerData(cust)
   }
 
-  modifyCustomer(customer: Customer) {
-    this._customers = this._customers.map( (c: Customer) => {
+  async modifyCustomer(customer: Customer) {
+    const cust = this.customers$.getValue().map((c: Customer) => {
       if (c.id === customer.id) {
         c.name = customer.name;
         c.ocupation = customer.ocupation;
       }
       return c;
-    })
-    this.saveCustomerData()
+    });
+    await this.saveCustomerData(cust)
+  }
+
+  async saveCustomerData(customers: Customer[]) {
+    this.customers$.next(customers);
+    const resp = await this._storageService.setStore('CUSTOMERS_DATA', customers)
   }
 
   fakeUniqueId() {
@@ -58,15 +72,4 @@ export class CustomerService {
     const randomness = Math.random().toString(36).substr(2);
     return dateString + randomness;
   };
-
-  fakeRefresh(){
-    const customersData = localStorage.getItem('CUSTOMERS_DATA')!==null ? JSON.parse(localStorage.getItem('CUSTOMERS_DATA')!) : [];
-    this._customers = customersData
-    console.log(this._customers);
-  }
-
-  saveCustomerData() {
-    localStorage.setItem('CUSTOMERS_DATA', JSON.stringify(this.customers));
-    console.log(this.customers);
-  }
 }

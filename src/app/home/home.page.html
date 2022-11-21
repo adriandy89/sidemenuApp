@@ -21,11 +21,11 @@
         <ion-card class="card-width">
           <ion-card-header>
             <ion-card-title>Customers</ion-card-title>
-            <ion-card-subtitle>Total: {{customers.length}}</ion-card-subtitle>
+            <ion-card-subtitle>Total: {{ long }}</ion-card-subtitle>
           </ion-card-header>
           <ion-card-content>
             <ion-list>
-              <ion-item *ngFor="let customer of customers">
+              <ion-item *ngFor="let customer of customers$ | async">
                 <ion-thumbnail slot="start">
                   <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/thumbnail.svg" />
                 </ion-thumbnail>

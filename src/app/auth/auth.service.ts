@@ -82,7 +82,7 @@ export class AuthService {
         map((fakeData: FakeData) => {
         if (email === fakeData.fakeAuth.email && password === fakeData.fakeAuth.password){
           this.user$.next(fakeData.fakeUserData)
-          localStorage.setItem('USER_DATA', JSON.stringify(fakeData.fakeUserData))
+          sessionStorage.setItem('USER_DATA', JSON.stringify(fakeData.fakeUserData))
           return fakeData.fakeUserData;
         } else {
           throw new HttpErrorResponse({
@@ -95,7 +95,7 @@ export class AuthService {
   }
 
   fakeRefresh(){
-    const userData = localStorage.getItem('USER_DATA')!==null ? JSON.parse(localStorage.getItem('USER_DATA')!) : null;
+    const userData = sessionStorage.getItem('USER_DATA')!==null ? JSON.parse(sessionStorage.getItem('USER_DATA')!) : null;
     this.user$.next(userData)
     console.log(userData);
   }

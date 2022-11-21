@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
+import { Observable, Subscription } from 'rxjs';
 import { CustomerModalComponent } from './customer-modal/customer-modal.component';
 import { Customer, CustomerService } from './customer.service';
 
@@ -11,33 +12,39 @@ import { Customer, CustomerService } from './customer.service';
 })
 export class HomePage implements OnInit {
 
-  customers: Customer[] = []
-  message = 'This modal example uses the modalController to present and dismiss modals.';
+  customers$: Observable<Customer[]>
+  custSubsc!: Subscription;
+  long = 0;
 
-
-  constructor(private readonly _customerService: CustomerService, private modalCtrl: ModalController) {
+  constructor(
+    private readonly _customerService: CustomerService,
+    private modalCtrl: ModalController
+    ) {
+    this._customerService.getCustomers();
+    this.customers$ = this._customerService.customers;
   }
 
   ngOnInit() {
-    this.getCustomers()
+    this.custSubsc = this.customers$.subscribe(data => {
+      if (data)
+        this.long = data.length;
+    })
   }
 
-  getCustomers() {
-    this.customers = this._customerService.customers
+  ngOnDestroy(): void {
+    this.custSubsc.unsubscribe();
   }
 
-  addCustomer(customer: Customer) {
-    this._customerService.addCustomer(customer);
+  async addCustomer(customer: Customer) {
+    await this._customerService.addCustomer(customer);
   }
 
-  deleteCustomer(id: string) {
-    this._customerService.deleteCustomer(id);
-    this.getCustomers();
+  async deleteCustomer(id: string) {
+    await this._customerService.deleteCustomer(id);
   }
 
-  modifyCustomer(customer: Customer) {
-    this._customerService.modifyCustomer(customer);
-    this.getCustomers();
+  async modifyCustomer(customer: Customer) {
+    await this._customerService.modifyCustomer(customer);
   }
 
   async openModal(customer?: Customer) {
@@ -50,7 +57,6 @@ export class HomePage implements OnInit {
     modal.present();
     const { data, role } = await modal.onWillDismiss();
     if (role === 'confirm') {
-      console.log(data);
       if (data.id === '')
         this.addCustomer(data)
       else this.modifyCustomer(data)
